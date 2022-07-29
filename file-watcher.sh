@@ -1,39 +1,44 @@
 #!/bin/bash
+WATCHED_NAME=$1
+shift 1
+COMMAND_TO_RUN=$@
 
-if [[ -z "$1" ]]
+# If empty string or does not exist
+if [[ (-z "$WATCHED_NAME") || (! -e $WATCHED_NAME) ]]
 then
-    echo "No argument provided"
+    echo "No file/directory provider or does not exist..."
     exit 0
 else
-    if [[ ! -e $1 ]]
+    if [[ -f $WATCHED_NAME ]]
     then
-        echo "File does not exist"
-        exit 0
-    else
-        echo "Watching $1..."
+        TYPE="file"
     fi
+    if [[ -d $WATCHED_NAME ]]
+    then
+        TYPE="directory"
+    fi
+
+    echo "Watching $TYPE $WATCHED_NAME..."
 fi
 
-WATCHED_FILE_NAME=$1
-shift 1
-
-LAST_TIME_MODIFIED="$(stat -c %Y $WATCHED_FILE_NAME)"
+LAST_TIME_MODIFIED="$(find $WATCHED_NAME -type f -exec md5sum {} \; | md5sum)"
 
 while true; do
-    if [[ ! -e $WATCHED_FILE_NAME ]]
+    if [[ ! -e $WATCHED_NAME ]]
     then
-        echo "File does not exist"
+        echo "${TYPE^} does not exist"
         exit 0
     fi
     sleep 1
-    CURRENT_LAST_TIME_MODIFIED="$(stat -c %Y $WATCHED_FILE_NAME)"
+    CURRENT_LAST_TIME_MODIFIED="$(find $WATCHED_NAME -type f -exec md5sum {} \; | md5sum)"
+
     if [[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]]
     then
         LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
 
         CURRENT_TIME=$(date +'%Y-%m-%d %H:%M:%S')
-        echo "[$CURRENT_TIME] File $WATCHED_FILE_NAME has changed"
+        echo "[$CURRENT_TIME] ${TYPE^} $WATCHED_NAME has changed"
 
-        eval $@
+        eval $COMMAND_TO_RUN
     fi
 done
