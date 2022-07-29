@@ -22,7 +22,7 @@ else
     echo "Watching $TYPE $WATCHED_NAME..."
 fi
 
-LAST_TIME_MODIFIED="$(find $WATCHED_NAME -type f -exec md5sum {} \; | md5sum)"
+LAST_TIME_MODIFIED="$(ls -laR $WATCHED_NAME | md5sum)"
 
 while true; do
     if [[ ! -e $WATCHED_NAME ]]
@@ -31,7 +31,7 @@ while true; do
         exit 0
     fi
     sleep $TIME_BETWEEN_WATCHES
-    CURRENT_LAST_TIME_MODIFIED="$(find $WATCHED_NAME -type f -exec md5sum {} \; | md5sum)"
+    CURRENT_LAST_TIME_MODIFIED="$(ls -laR $WATCHED_NAME | md5sum)"
 
     if [[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]]
     then
