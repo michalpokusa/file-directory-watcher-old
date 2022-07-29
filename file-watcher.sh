@@ -1,6 +1,7 @@
 #!/bin/bash
 WATCHED_NAME=$1
-shift 1
+TIME_BETWEEN_WATCHES=$2
+shift 2
 COMMAND_TO_RUN=$@
 
 # If empty string or does not exist
@@ -29,7 +30,7 @@ while true; do
         echo "${TYPE^} does not exist"
         exit 0
     fi
-    sleep 1
+    sleep $TIME_BETWEEN_WATCHES
     CURRENT_LAST_TIME_MODIFIED="$(find $WATCHED_NAME -type f -exec md5sum {} \; | md5sum)"
 
     if [[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]]
