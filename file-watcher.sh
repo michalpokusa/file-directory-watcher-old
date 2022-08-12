@@ -38,8 +38,9 @@ while true; do
         LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
 
         CURRENT_TIME=$(date +'%Y-%m-%d %H:%M:%S')
-        echo "[$CURRENT_TIME] ${TYPE^} $WATCHED_NAME has changed"
 
+        echo "[$CURRENT_TIME] ${TYPE^} $WATCHED_NAME changed: $COMMAND_TO_RUN"
         eval $COMMAND_TO_RUN
+        echo "[$CURRENT_TIME] Back to watching ${TYPE^} $WATCHED_NAME"
     fi
 done
