@@ -1,7 +1,11 @@
 #!/bin/bash
+
 WATCHED_NAME=$1
 TIME_BETWEEN_WATCHES=$2
-shift 2
+BLOCKING=$3
+
+shift 3
+
 COMMAND_TO_RUN=$@
 
 # Function that returns the current time in pre-defined format
@@ -49,7 +53,14 @@ while true; do
         LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
 
         echo "[$(currentTime)] ${TYPE^} $WATCHED_NAME changed: $COMMAND_TO_RUN"
-        eval $COMMAND_TO_RUN
+
+        if [[ $BLOCKING == "block" ]]
+        then
+            eval $COMMAND_TO_RUN
+        else
+            eval $COMMAND_TO_RUN &
+        fi
+
         echo "[$(currentTime)] Back to watching ${TYPE^} $WATCHED_NAME"
     fi
 done
