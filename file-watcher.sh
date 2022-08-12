@@ -38,13 +38,13 @@ LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
 while true; do
     if [[ ! -e $WATCHED_NAME ]]
     then
-        echo "${TYPE^} does not exist"
+        echo "${TYPE^} $WATCHED_NAME does not exist"
         exit 0
     fi
     sleep $TIME_BETWEEN_WATCHES
     CURRENT_LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
 
-    if [[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]]
+    if ([[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]] && [[ -e $WATCHED_NAME ]])
     then
         LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
 
