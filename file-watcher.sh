@@ -4,6 +4,17 @@ TIME_BETWEEN_WATCHES=$2
 shift 2
 COMMAND_TO_RUN=$@
 
+# Function that returns the current time in pre-defined format
+currentTime() {
+    echo $(date +'%Y-%m-%d %H:%M:%S.%N%:z')
+}
+
+# Function that returns the current state of the watched directory
+currentDirectoryState() {
+    echo $(ls -lu --almost-all --recursive --full-time $1 &2>/dev/null)
+}
+
+
 # If empty string or does not exist
 if [[ (-z "$WATCHED_NAME") || (! -e $WATCHED_NAME) ]]
 then
@@ -22,7 +33,7 @@ else
     echo "Watching $TYPE $WATCHED_NAME..."
 fi
 
-LAST_TIME_MODIFIED="$(ls -laR $WATCHED_NAME | md5sum)"
+LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
 
 while true; do
     if [[ ! -e $WATCHED_NAME ]]
@@ -31,16 +42,14 @@ while true; do
         exit 0
     fi
     sleep $TIME_BETWEEN_WATCHES
-    CURRENT_LAST_TIME_MODIFIED="$(ls -laR $WATCHED_NAME | md5sum)"
+    CURRENT_LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
 
     if [[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]]
     then
         LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
 
-        CURRENT_TIME=$(date +'%Y-%m-%d %H:%M:%S')
-
-        echo "[$CURRENT_TIME] ${TYPE^} $WATCHED_NAME changed: $COMMAND_TO_RUN"
+        echo "[$(currentTime)] ${TYPE^} $WATCHED_NAME changed: $COMMAND_TO_RUN"
         eval $COMMAND_TO_RUN
-        echo "[$CURRENT_TIME] Back to watching ${TYPE^} $WATCHED_NAME"
+        echo "[$(currentTime)] Back to watching ${TYPE^} $WATCHED_NAME"
     fi
 done
