@@ -15,7 +15,7 @@ currentTime() {
 
 # Function that returns the current state of the watched directory
 currentDirectoryState() {
-    echo $(ls -lu --almost-all --recursive --full-time $1 &2>/dev/null)
+    echo $(ls -lu --almost-all --recursive --full-time $1)
 }
 
 
