@@ -30,6 +30,19 @@ do
         command=${option#*=}
         ;;
 
+        # Show this help
+        -h|--help)
+        echo "Usage: file-watcher.sh -f=<file or directory> -i=<interval> -b -c=<command>"
+        echo "Watch a file or directory and execute a command when it changes."
+        echo ""
+        echo "-f/-d, --file/-directory:     File or directory to watch"
+        echo "-i, --interval:               Interval between watches"
+        echo "-b, --background:             Run command in background"
+        echo "-c, --command:                Command to execute"
+        echo "-h, --help:                   Show this help"
+        exit 0
+        ;;
+
         # Unknown option
         *)
         ;;
