@@ -59,14 +59,14 @@ echo "Watching $type $watched_file_or_folder..."
 
 last_time_state="$(currentDirectoryState $watched_file_or_folder)"
 
-while true; do
+while sleep $interval; do
 
     if [[ ! -e $watched_file_or_folder ]]
     then
         echo "${type^} $watched_file_or_folder does not exist"
         exit 0
     fi
-    sleep $interval
+
     current_state="$(currentDirectoryState $watched_file_or_folder)"
 
     if ([[ $last_time_state != $current_state ]] && [[ -e $watched_file_or_folder ]])
