@@ -1,12 +1,41 @@
 #!/bin/bash
 
-WATCHED_NAME=$1
-TIME_BETWEEN_WATCHES=$2
-BLOCKING=$3
+# Parsing command line arguments
+for option in "$@"
+do
+    case $option in
 
-shift 3
+        # File or directory to watch
+        -f=*|--file=*)
+        type="file"
+        watched_file_or_folder=${option#*=}
+        ;;
+        -d=*|--directory=*)
+        type="directory"
+        watched_file_or_folder=${option#*=}
+        ;;
 
-COMMAND_TO_RUN=$@
+        # Interval between watches
+        -i=*|--interval=*)
+        interval=${option#*=}
+        ;;
+
+        # Run command in background
+        -b|--background)
+        background=true
+        ;;
+
+        # Command to execute
+        -c=*|--command=*)
+        command=${option#*=}
+        ;;
+
+        # Unknown option
+        *)
+        ;;
+    esac
+done
+
 
 # Function that returns the current time in pre-defined format
 currentTime() {
@@ -20,47 +49,39 @@ currentDirectoryState() {
 
 
 # If empty string or does not exist
-if [[ (-z "$WATCHED_NAME") || (! -e $WATCHED_NAME) ]]
+if [[ (-z "$watched_file_or_folder") || (! -e $watched_file_or_folder) ]]
 then
     echo "No file/directory provider or does not exist..."
     exit 0
-else
-    if [[ -f $WATCHED_NAME ]]
-    then
-        TYPE="file"
-    fi
-    if [[ -d $WATCHED_NAME ]]
-    then
-        TYPE="directory"
-    fi
-
-    echo "Watching $TYPE $WATCHED_NAME..."
 fi
 
-LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
+echo "Watching $type $watched_file_or_folder..."
+
+last_time_state="$(currentDirectoryState $watched_file_or_folder)"
 
 while true; do
-    if [[ ! -e $WATCHED_NAME ]]
+
+    if [[ ! -e $watched_file_or_folder ]]
     then
-        echo "${TYPE^} $WATCHED_NAME does not exist"
+        echo "${type^} $watched_file_or_folder does not exist"
         exit 0
     fi
-    sleep $TIME_BETWEEN_WATCHES
-    CURRENT_LAST_TIME_MODIFIED="$(currentDirectoryState $WATCHED_NAME)"
+    sleep $interval
+    current_state="$(currentDirectoryState $watched_file_or_folder)"
 
-    if ([[ $LAST_TIME_MODIFIED != $CURRENT_LAST_TIME_MODIFIED ]] && [[ -e $WATCHED_NAME ]])
+    if ([[ $last_time_state != $current_state ]] && [[ -e $watched_file_or_folder ]])
     then
-        LAST_TIME_MODIFIED="$CURRENT_LAST_TIME_MODIFIED"
+        last_time_state="$current_state"
 
-        echo "[$(currentTime)] ${TYPE^} $WATCHED_NAME changed: $COMMAND_TO_RUN"
+        echo "[$(currentTime)] ${type^} $watched_file_or_folder changed: $command"
 
-        if [[ $BLOCKING == "block" ]]
+        if [[ $background ]]
         then
-            eval $COMMAND_TO_RUN
+            eval $command &
         else
-            eval $COMMAND_TO_RUN &
+            eval $command
         fi
 
-        echo "[$(currentTime)] Back to watching ${TYPE^} $WATCHED_NAME"
+        echo "[$(currentTime)] Back to watching ${type^} $watched_file_or_folder"
     fi
 done
