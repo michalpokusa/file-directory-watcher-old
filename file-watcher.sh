@@ -48,7 +48,7 @@ currentDirectoryState() {
 }
 
 
-# If empty string or does not exist
+# Exit if file or directory does not exist
 if [[ (-z "$watched_file_or_folder") || (! -e $watched_file_or_folder) ]]
 then
     echo "No file/directory provider or does not exist..."
@@ -61,6 +61,7 @@ last_time_state="$(currentDirectoryState $watched_file_or_folder)"
 
 while sleep $interval; do
 
+    # Exit if file or directory does not exist
     if [[ ! -e $watched_file_or_folder ]]
     then
         echo "${type^} $watched_file_or_folder does not exist"
@@ -69,16 +70,18 @@ while sleep $interval; do
 
     current_state="$(currentDirectoryState $watched_file_or_folder)"
 
+    # Checking if the state of the file/directory has changed
     if ([[ $last_time_state != $current_state ]] && [[ -e $watched_file_or_folder ]])
     then
         last_time_state="$current_state"
 
-        echo "[$(currentTime)] ${type^} $watched_file_or_folder changed: $command"
-
+        # Executing the command in background if specified, otherwise executing it in foreground
         if [[ $background ]]
         then
+            echo "[$(currentTime)] Running in background: $command"
             eval $command &
         else
+            echo "[$(currentTime)] Running in foreground: $command"
             eval $command
         fi
 
