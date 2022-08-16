@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Default values
+interval=10
+command="echo Detected change"
+
 # Parsing command line arguments
 watched_files_and_folders=()
 while [[ $# -gt 0 ]]; do
