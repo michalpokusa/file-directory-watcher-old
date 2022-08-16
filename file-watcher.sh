@@ -1,59 +1,54 @@
 #!/bin/bash
 
 # Parsing command line arguments
-for option in "$@"
-do
-    case $option in
+watched_files_and_folders=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
 
-        # File or directory to watch
-        -f=*|--file=*)
-        type="file"
-        watched_file_or_folder=${option#*=}
-        ;;
-        -d=*|--directory=*)
-        type="directory"
-        watched_file_or_folder=${option#*=}
-        ;;
+    # Interval between watches
+    -i|--interval)
+        interval=$2
+        shift 2
+    ;;
 
-        # Interval between watches
-        -i=*|--interval=*)
-        interval=${option#*=}
-        ;;
-
-        # Run command in background
-        -b|--background)
+    # Run command in background
+    -b|--background)
         background=true
-        ;;
+        shift 1
+    ;;
 
-        # Command to execute
-        -c=*|--command=*)
-        command=${option#*=}
-        ;;
+    # Command to execute
+    -c|--command)
+        command=$2
+        shift 2
+    ;;
 
-        # Show this help
-        -h|--help)
-        echo "Usage: file-watcher.sh -f=<file or directory> -i=<interval> -b -c=<command>"
-        echo "Watch a file or directory and execute a command when it changes."
-        echo ""
-        echo "-f/-d, --file/-directory:     File or directory to watch"
-        echo "-i, --interval:               Interval between watches"
-        echo "-b, --background:             Run command in background"
-        echo "-c, --command:                Command to execute"
-        echo "-h, --help:                   Show this help"
-        exit 0
-        ;;
+    # Show this help
+    -h|--help)
+    echo "Usage: file-watcher.sh [options...] [files or folders to watch...]"
+    echo "Watch files or/and directories and execute a command when they change."
+    echo ""
+    echo "-i, --interval:               Interval between watches"
+    echo "-b, --background:             Run command in background"
+    echo "-c, --command:                Command to execute"
+    echo "-h, --help:                   Show this help"
+    exit 0
+    ;;
 
-        # Unknown option
-        -*|--*)
-        echo Unknown option: $option
+    # Unknown option
+    -*|--*)
+        echo Unknown option $1
         exit 1
-        ;;
+    ;;
 
-        # Positional argument
-        *)
-        ;;
-    esac
+    # File or directory to watch
+    *)
+        watched_files_and_folders+=("$1")
+        shift
+    ;;
+  esac
 done
+set -- "${watched_files_and_folders[@]}"
 
 
 # Function that returns the current time in pre-defined format
@@ -61,36 +56,23 @@ currentTime() {
     echo $(date +'%Y-%m-%d %H:%M:%S.%N%:z')
 }
 
-# Function that returns the current state of the watched directory
+# Function that returns the current state of the watched files and directories
 currentDirectoryState() {
-    echo $(ls -lu --almost-all --recursive --full-time $1)
+    echo $(ls -lu --almost-all --recursive --full-time $@)
 }
 
 
-# Exit if file or directory does not exist
-if [[ (-z "$watched_file_or_folder") || (! -e $watched_file_or_folder) ]]
-then
-    echo "No file/directory provider or does not exist..."
-    exit 0
-fi
 
-echo "Watching $type $watched_file_or_folder..."
+echo "Watching ${watched_files_and_folders[@]}..."
 
-last_time_state="$(currentDirectoryState $watched_file_or_folder)"
+last_time_state="$(currentDirectoryState ${watched_files_and_folders[@]})"
 
 while sleep $interval; do
 
-    # Exit if file or directory does not exist
-    if [[ ! -e $watched_file_or_folder ]]
-    then
-        echo "${type^} $watched_file_or_folder does not exist"
-        exit 0
-    fi
-
-    current_state="$(currentDirectoryState $watched_file_or_folder)"
+    current_state="$(currentDirectoryState ${watched_files_and_folders[@]})"
 
     # Checking if the state of the file/directory has changed
-    if ([[ $last_time_state != $current_state ]] && [[ -e $watched_file_or_folder ]])
+    if ([[ $last_time_state != $current_state ]] )
     then
         last_time_state="$current_state"
 
