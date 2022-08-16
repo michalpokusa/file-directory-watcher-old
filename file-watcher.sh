@@ -44,6 +44,12 @@ do
         ;;
 
         # Unknown option
+        -*|--*)
+        echo Unknown option: $option
+        exit 1
+        ;;
+
+        # Positional argument
         *)
         ;;
     esac
