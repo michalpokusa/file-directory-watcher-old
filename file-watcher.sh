@@ -70,7 +70,7 @@ currentTime() {
 
 # Function that returns the current state of the watched files and directories
 currentDirectoryState() {
-    echo $(ls -lu --almost-all --recursive --full-time $@)
+    echo $(ls -lu --almost-all --recursive --full-time $@ 2>/dev/null)
 }
 
 
