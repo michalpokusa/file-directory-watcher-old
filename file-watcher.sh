@@ -14,6 +14,10 @@ while [[ $# -gt 0 ]]; do
         interval=$2
         shift 2
     ;;
+    -i=*|--interval=*)
+        interval=${1#*=}
+        shift
+    ;;
 
     # Run command in background
     -b|--background)
@@ -25,6 +29,10 @@ while [[ $# -gt 0 ]]; do
     -c|--command)
         command=$2
         shift 2
+    ;;
+    -c=*|--command=*)
+        command=${1#*=}
+        shift
     ;;
 
     # Show this help
