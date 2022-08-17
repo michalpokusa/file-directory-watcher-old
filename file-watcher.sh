@@ -66,7 +66,7 @@ currentDirectoryState() {
 }
 
 
-echo "Watching ${watched_files_and_folders[@]}..."
+echo "[$(currentTime)] Watching ${watched_files_and_folders[@]}..."
 
 last_time_state="$(currentDirectoryState ${watched_files_and_folders[@]})"
 
