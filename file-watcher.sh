@@ -7,7 +7,7 @@ command="echo Detected change"
 # Parsing command line arguments
 watched_files_and_folders=()
 while [[ $# -gt 0 ]]; do
-  case $1 in
+    case $1 in
 
     # Interval between watches
     -i|--interval)
@@ -50,7 +50,7 @@ while [[ $# -gt 0 ]]; do
         watched_files_and_folders+=("$1")
         shift
     ;;
-  esac
+    esac
 done
 set -- "${watched_files_and_folders[@]}"
 
@@ -64,7 +64,6 @@ currentTime() {
 currentDirectoryState() {
     echo $(ls -lu --almost-all --recursive --full-time $@)
 }
-
 
 
 echo "Watching ${watched_files_and_folders[@]}..."
