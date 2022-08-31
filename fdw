@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
     ;;
     -i=*|--interval=*)
         interval=${1#*=}
-        shift
+        shift 1
     ;;
 
     # Run command in background
@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
     ;;
     -c=*|--command=*)
         command=${1#*=}
-        shift
+        shift 1
     ;;
 
     # Update script from GitHub repository
@@ -44,15 +44,15 @@ while [[ $# -gt 0 ]]; do
 
     # Show this help
     -h|--help)
-    echo "Usage: fdw [options...] [files or folders to watch...]"
-    echo "Watch files or/and directories and execute a command when they change."
-    echo ""
-    echo "-i, --interval:               Interval between watches"
-    echo "-b, --background:             Run command in background"
-    echo "-c, --command:                Command to execute"
-    echo "-u, --update:                 Update script from GitHub repository"
-    echo "-h, --help:                   Show this help"
-    exit 0
+        echo "Usage: fdw [options...] [files or folders to watch...]"
+        echo "Watch files or/and directories and execute a command when they change."
+        echo ""
+        echo "-i, --interval:               Interval between watches"
+        echo "-b, --background:             Run command in background"
+        echo "-c, --command:                Command to execute"
+        echo "-u, --update:                 Update script from GitHub repository"
+        echo "-h, --help:                   Show this help"
+        exit 0
     ;;
 
     # Unknown option
@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
     # File or directory to watch
     *)
         watched_files_and_folders+=("$1")
-        shift
+        shift 1
     ;;
     esac
 done
@@ -82,7 +82,7 @@ currentDirectoryState() {
 }
 
 
-echo "[$(currentTime)] Watching ${watched_files_and_folders[@]}..."
+echo "[$(currentTime)] Watching ${watched_files_and_folders[@]} every ${interval}s..."
 
 last_time_state="$(currentDirectoryState ${watched_files_and_folders[@]})"
 
