@@ -1,4 +1,5 @@
 #!/bin/bash
+{
 
 # Default values
 interval=10
@@ -35,6 +36,12 @@ while [[ $# -gt 0 ]]; do
         shift
     ;;
 
+    # Update script from GitHub repository
+    -u|--update)
+        curl https://raw.githubusercontent.com/michalpokusa/file-directory-watcher/main/file-watcher.sh > $0
+        exit 0
+    ;;
+
     # Show this help
     -h|--help)
     echo "Usage: file-watcher.sh [options...] [files or folders to watch...]"
@@ -43,6 +50,7 @@ while [[ $# -gt 0 ]]; do
     echo "-i, --interval:               Interval between watches"
     echo "-b, --background:             Run command in background"
     echo "-c, --command:                Command to execute"
+    echo "-u, --update:                 Update script from GitHub repository"
     echo "-h, --help:                   Show this help"
     exit 0
     ;;
@@ -100,3 +108,4 @@ while sleep $interval; do
         echo "[$(currentTime)] Back to watching ${type^} $watched_file_or_folder"
     fi
 done
+}
