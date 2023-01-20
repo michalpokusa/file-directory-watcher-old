@@ -5,6 +5,24 @@
 interval=10
 command="echo Detected change"
 
+# Function that displays the help
+displayHelp() {
+    echo "Usage: fdw.sh [options...] [files or folders to watch...]"
+    echo "Watch files or/and directories and execute a command when they change."
+    echo ""
+    echo "-i, --interval:               Interval between watches"
+    echo "-b, --background:             Run command in background"
+    echo "-c, --command:                Command to execute"
+    echo "-u, --update:                 Update script from GitHub repository"
+    echo "-h, --help:                   Show this help"
+}
+
+# If no arguments are specified, display the help, then exit
+if [[ $# -eq 0 ]]; then
+    displayHelp
+    exit 0
+fi
+
 # Parsing command line arguments
 watched_files_and_folders=()
 while [[ $# -gt 0 ]]; do
@@ -38,20 +56,13 @@ while [[ $# -gt 0 ]]; do
 
     # Update script from GitHub repository
     -u|--update)
-        curl https://raw.githubusercontent.com/michalpokusa/file-directory-watcher/main/fdw > $0
+        curl https://raw.githubusercontent.com/michalpokusa/file-directory-watcher/main/fdw.sh > $0
         exit 0
     ;;
 
     # Show this help
     -h|--help)
-        echo "Usage: fdw [options...] [files or folders to watch...]"
-        echo "Watch files or/and directories and execute a command when they change."
-        echo ""
-        echo "-i, --interval:               Interval between watches"
-        echo "-b, --background:             Run command in background"
-        echo "-c, --command:                Command to execute"
-        echo "-u, --update:                 Update script from GitHub repository"
-        echo "-h, --help:                   Show this help"
+        displayHelp
         exit 0
     ;;
 
